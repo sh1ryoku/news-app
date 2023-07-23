@@ -12,7 +12,7 @@ import ru.shiryoku.news.databinding.NewsCardBinding
 import ru.shiryoku.news.domain.models.article.Article
 import ru.shiryoku.news.presentation.screens.search.screen.NewsSearchFragment
 
-class NewsSearchAdapter() :
+class NewsSearchAdapter :
     PagingDataAdapter<Article, NewsSearchAdapter.NewsSearchHolder>(
         ArticleDiffItemCallback
     ) {

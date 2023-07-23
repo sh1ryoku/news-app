@@ -23,7 +23,7 @@ class NewsSearchFragment : Fragment() {
     private val viewModel by viewModel<NewsSearchViewModel>()
     private lateinit var binding: FragmentNewsSearchBinding
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
-        NewsSearchAdapter(this)
+        NewsSearchAdapter()
     }
 
     override fun onCreateView(
