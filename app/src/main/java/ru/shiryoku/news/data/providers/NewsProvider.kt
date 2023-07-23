@@ -5,7 +5,7 @@ import retrofit2.http.Query
 import ru.shiryoku.news.data.models.SearchResultDto
 
 interface NewsProvider {
-    @GET("top-headlines")
+    @GET("everything")
     suspend fun searchNews(
         @Query("q") query: String,
         @Query("page") page: Int,

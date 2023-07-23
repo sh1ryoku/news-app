@@ -2,6 +2,7 @@ package ru.shiryoku.news.data.models.article
 
 import com.google.gson.annotations.SerializedName
 import ru.shiryoku.news.domain.models.article.Article
+import ru.shiryoku.news.helpers.parseDate
 
 data class ArticleDto(
     @SerializedName("source") val source: ArticleSourceDto,
@@ -21,7 +22,7 @@ data class ArticleDto(
             description = description ?: "",
             url = url ?: "",
             imageUrl = imageUrl ?: "",
-            publishedAt = publishedAt ?: "",
+            publishedAt = parseDate(publishedAt) ?: "",
             content = content ?: "",
         )
     }

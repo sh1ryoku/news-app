@@ -2,38 +2,30 @@ package ru.shiryoku.news.presentation.screens.search.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
-import ru.shiryoku.news.domain.models.RequestResult
-import ru.shiryoku.news.domain.models.article.Article
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
+import androidx.paging.liveData
 import ru.shiryoku.news.domain.repository.NewsRepository
-import ru.shiryoku.news.extension.livedata.asLiveData
+import ru.shiryoku.news.paging.PagingSource
 
 private const val pageSize = 10
 
 class NewsSearchViewModel(
     private val newsRepository: NewsRepository
 ) : ViewModel() {
+    private val currentQuery = MutableLiveData<String>()
 
-    init {
-        searchNews(query = "sport")
+    val news = currentQuery.switchMap { query ->
+        Pager(PagingConfig(pageSize)) {
+            PagingSource(newsRepository, query)
+        }.liveData
+            .cachedIn(viewModelScope)
     }
 
-    private val _news = MutableLiveData<List<Article>>()
-
-    val news = _news.asLiveData()
-
-    fun searchNews(query: String) {
-        viewModelScope.launch {
-            val result = newsRepository.searchNews(query = query, page = 1, pageSize = pageSize) // TODO тут нужно добавить пагинацию при пролистывании
-            if (result is RequestResult.Success) {
-                val articles = result.data
-                _news.value = articles
-                return@launch
-            }
-            if (result is RequestResult.Error) {
-                //handle error
-            }
-        }
+    fun setCurrentQuery(query: String) {
+        currentQuery.postValue(query)
     }
 }
