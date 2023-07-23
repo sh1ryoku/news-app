@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -22,7 +23,7 @@ class NewsSearchFragment : Fragment() {
 
     private val viewModel by viewModel<NewsSearchViewModel>()
     private lateinit var binding: FragmentNewsSearchBinding
-    private val adapter by lazy(LazyThreadSafetyMode.NONE) {
+    private val adapter by lazy() {
         NewsSearchAdapter()
     }
 
@@ -38,6 +39,7 @@ class NewsSearchFragment : Fragment() {
         return binding.root
     }
 
+    @OptIn(FlowPreview::class)
     private fun setUpUi() {
         binding.rvSearch.adapter = adapter
         binding.searchBar.textChanges().debounce(SEARCH_DEBOUNCE)
