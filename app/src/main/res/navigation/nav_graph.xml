@@ -9,5 +9,18 @@
         android:id="@+id/newsSearchFragment"
         android:name="ru.shiryoku.news.presentation.screens.search.screen.NewsSearchFragment"
         android:label="fragment_news_search"
-        tools:layout="@layout/fragment_news_search" />
+        tools:layout="@layout/fragment_news_search" >
+        <action
+            android:id="@+id/action_newsSearchFragment_to_detailPageFragment"
+            app:destination="@id/detailPageFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailPageFragment"
+        android:name="ru.shiryoku.news.presentation.screens.detail_page.screen.DetailPageFragment"
+        android:label="fragment_detail_page"
+        tools:layout="@layout/fragment_detail_page" >
+        <action
+            android:id="@+id/action_detailPageFragment_to_newsSearchFragment"
+            app:destination="@id/newsSearchFragment" />
+    </fragment>
 </navigation>
