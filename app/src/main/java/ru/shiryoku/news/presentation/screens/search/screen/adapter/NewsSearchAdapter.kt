@@ -3,8 +3,8 @@ package ru.shiryoku.news.presentation.screens.search.screen.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.shiryoku.news.R
@@ -12,9 +12,7 @@ import ru.shiryoku.news.databinding.NewsCardBinding
 import ru.shiryoku.news.domain.models.article.Article
 
 class NewsSearchAdapter(private val onArticleClick: (Article) -> Unit) :
-    PagingDataAdapter<Article, NewsSearchAdapter.NewsSearchHolder>(
-        ArticleDiffItemCallback
-    ) {
+    ListAdapter<Article, NewsSearchAdapter.NewsSearchHolder>(ArticleDiffItemCallback) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup, viewType: Int

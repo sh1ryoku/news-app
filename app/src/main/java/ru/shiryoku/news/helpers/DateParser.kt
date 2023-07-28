@@ -1,7 +1,6 @@
 package ru.shiryoku.news.helpers
 
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 fun parseDate(date: String?): String? {
@@ -9,6 +8,5 @@ fun parseDate(date: String?): String? {
     val newDate = date?.let { format.parse(it) }
 
     format = SimpleDateFormat("EEEE, dd MMMM yyyy", Locale("en"))
-    val formattedDate = newDate?.let { format.format(it) }
-    return formattedDate
+    return newDate?.let { format.format(it) }
 }

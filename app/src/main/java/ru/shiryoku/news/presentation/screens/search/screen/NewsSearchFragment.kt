@@ -8,6 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
@@ -27,7 +30,7 @@ class NewsSearchFragment : Fragment() {
 
     private val viewModel by viewModel<NewsSearchViewModel>()
     private lateinit var binding: FragmentNewsSearchBinding
-    private val adapter by lazy() {
+    private val adapter by lazy {
         NewsSearchAdapter(
             onArticleClick = { article -> onArticleClick(article = article) }
         )
@@ -48,23 +51,46 @@ class NewsSearchFragment : Fragment() {
     @OptIn(FlowPreview::class)
     private fun setUpUi() {
         binding.rvSearch.adapter = adapter
+        binding.rvSearch.addOnScrollListener(object : OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val totalItemCount = layoutManager.itemCount
+                if (totalItemCount == 0) return
+
+                val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+
+                val percentageScrolled = 100 * lastVisibleItemPosition / totalItemCount
+
+                val isLoading = viewModel.isLoading.value
+
+                if (isLoading == true || percentageScrolled < 70) return
+
+                val query = binding.searchBar.text.toString()
+                if (query.isEmpty()) return
+                viewModel.searchNews(query)
+            }
+        })
+
         binding.searchBar.textChanges().debounce(SEARCH_DEBOUNCE)
             .onEach { text ->
                 if (text.isNullOrEmpty()) return@onEach
-                viewModel.setCurrentQuery(query = text.toString())
+                viewModel.resetSearch()
+                viewModel.searchNews(text.toString())
             }
             .launchIn(lifecycleScope)
     }
 
+
     private fun setUpObserve() {
-        viewModel.news.observe(viewLifecycleOwner) { news ->
+        viewModel.articles.observe(viewLifecycleOwner) { articles ->
             lifecycleScope.launch {
-                adapter.submitData(news)
+                adapter.submitList(articles)
             }
         }
     }
 
-    fun onArticleClick(article: Article?) {
+    private fun onArticleClick(article: Article?) {
         val bundle = Bundle().apply {
             putSerializable(ARTICLE_KEY, article)
         }
