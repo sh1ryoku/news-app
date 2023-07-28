@@ -16,6 +16,8 @@ private const val pageSize = 20
 class NewsSearchViewModel(
     private val newsRepository: NewsRepository
 ) : ViewModel() {
+    private var category = "general"
+
     private var page = 1
 
     private var isLastPage = false
@@ -36,26 +38,45 @@ class NewsSearchViewModel(
 
     fun searchNews(query: String) {
         if (isLastPage) return
+        if (query.isEmpty()) {
+            viewModelScope.launch {
+                _isLoading.value = true
+                when (val requestResult =
+                    newsRepository.searchTopHeadlines(category = category, page = page, pageSize = pageSize)) {
+                    is RequestResult.Success -> {
+                        handleArticlesPage(requestResult.data)
+                    }
 
-        viewModelScope.launch {
-            _isLoading.value = true
-            when (val requestResult =
-                newsRepository.searchNews(query, page = page, pageSize = pageSize)) {
-                is RequestResult.Success -> {
-                    handleArticlesPage(requestResult.data)
+                    is RequestResult.Error -> {
+                        Log.e(
+                            "error",
+                            requestResult.exception.message ?: "Error occurred while fetching news"
+                        )
+                    }
                 }
+                _isLoading.value = false
 
-                is RequestResult.Error -> {
-                    Log.e(
-                        "error",
-                        requestResult.exception.message ?: "Error occured while fetching news"
-                    )
-                }
             }
-            _isLoading.value = false
+        } else {
+            viewModelScope.launch {
+                _isLoading.value = true
+                when (val requestResult =
+                    newsRepository.searchNews(query, page = page, pageSize = pageSize)) {
+                    is RequestResult.Success -> {
+                        handleArticlesPage(requestResult.data)
+                    }
+
+                    is RequestResult.Error -> {
+                        Log.e(
+                            "error",
+                            requestResult.exception.message ?: "Error occurred while fetching news"
+                        )
+                    }
+                }
+                _isLoading.value = false
+            }
         }
     }
-
 
     private fun handleArticlesPage(articles: List<Article>) {
         if (articles.isEmpty()) {

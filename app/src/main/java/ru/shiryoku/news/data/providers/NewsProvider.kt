@@ -11,4 +11,11 @@ interface NewsProvider {
         @Query("page") page: Int,
         @Query("pageSize") pageSize: Int
     ): SearchResultDto
+
+    @GET("top-headlines")
+    suspend fun searchTopHeadlines(
+        @Query("category") category: String,
+        @Query("page") page: Int,
+        @Query("pageSize") pageSize: Int
+    ): SearchResultDto
 }
