@@ -68,7 +68,10 @@ class NewsSearchFragment : Fragment() {
                 if (isLoading == true || percentageScrolled < 70) return
 
                 val query = binding.searchBar.text.toString()
-                if (query.isEmpty()) viewModel.searchTopHeadlines()
+                if (query.isEmpty()) {
+                    viewModel.searchTopHeadlines()
+                    return
+                }
                 viewModel.searchNews(query)
             }
         }
@@ -88,7 +91,10 @@ class NewsSearchFragment : Fragment() {
         super.onResume()
         binding.searchBar.textChanges().debounce(SEARCH_DEBOUNCE)
             .onEach { text ->
-                if (text.isNullOrEmpty()) viewModel.searchTopHeadlines()
+                if (text.isNullOrEmpty()){
+                    viewModel.searchTopHeadlines()
+                    return@onEach
+                }
                 viewModel.resetSearch()
                 viewModel.searchNews(text.toString())
             }

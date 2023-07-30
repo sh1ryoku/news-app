@@ -16,7 +16,7 @@ private const val pageSize = 20
 class NewsSearchViewModel(
     private val newsRepository: NewsRepository
 ) : ViewModel() {
-    private var category = "general"
+    private val category = "general"
 
     private var page = 1
 
