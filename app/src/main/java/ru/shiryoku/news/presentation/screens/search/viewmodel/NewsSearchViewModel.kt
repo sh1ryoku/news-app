@@ -36,45 +36,44 @@ class NewsSearchViewModel(
         page = 1
     }
 
+    fun searchTopHeadlines(){
+        viewModelScope.launch {
+            _isLoading.value = true
+            when (val requestResult =
+                newsRepository.searchTopHeadlines(category = category, page = page, pageSize = pageSize)) {
+                is RequestResult.Success -> {
+                    handleArticlesPage(requestResult.data)
+                }
+
+                is RequestResult.Error -> {
+                    Log.e(
+                        "error",
+                        requestResult.exception.message ?: "Error occurred while fetching news"
+                    )
+                }
+            }
+            _isLoading.value = false
+        }
+    }
     fun searchNews(query: String) {
         if (isLastPage) return
-        if (query.isEmpty()) {
-            viewModelScope.launch {
-                _isLoading.value = true
-                when (val requestResult =
-                    newsRepository.searchTopHeadlines(category = category, page = page, pageSize = pageSize)) {
-                    is RequestResult.Success -> {
-                        handleArticlesPage(requestResult.data)
-                    }
-
-                    is RequestResult.Error -> {
-                        Log.e(
-                            "error",
-                            requestResult.exception.message ?: "Error occurred while fetching news"
-                        )
-                    }
+        viewModelScope.launch {
+            _isLoading.value = true
+            when (val requestResult =
+                newsRepository.searchNews(query, page = page, pageSize = pageSize)) {
+                is RequestResult.Success -> {
+                    handleArticlesPage(requestResult.data)
                 }
-                _isLoading.value = false
 
-            }
-        } else {
-            viewModelScope.launch {
-                _isLoading.value = true
-                when (val requestResult =
-                    newsRepository.searchNews(query, page = page, pageSize = pageSize)) {
-                    is RequestResult.Success -> {
-                        handleArticlesPage(requestResult.data)
-                    }
-
-                    is RequestResult.Error -> {
-                        Log.e(
-                            "error",
-                            requestResult.exception.message ?: "Error occurred while fetching news"
-                        )
-                    }
+                is RequestResult.Error -> {
+                    Log.e(
+                        "error",
+                        requestResult.exception.message ?: "Error occurred while fetching news"
+                    )
                 }
-                _isLoading.value = false
             }
+            _isLoading.value = false
+
         }
     }
 
