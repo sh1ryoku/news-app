@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import ru.shiryoku.news.databinding.FragmentDetailPageBinding
 import ru.shiryoku.news.domain.models.article.Article
-import ru.shiryoku.news.extension.int.toPx
 import ru.shiryoku.news.presentation.screens.search.screen.NewsSearchFragment.Companion.ARTICLE_KEY
 
 class DetailPageFragment : Fragment() {

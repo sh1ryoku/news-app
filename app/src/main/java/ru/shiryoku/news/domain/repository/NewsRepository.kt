@@ -25,4 +25,24 @@ class NewsRepository(
             return RequestResult.Error(error)
         }
     }
+
+    suspend fun searchTopHeadlines(category: String, page: Int, pageSize: Int): RequestResult<List<Article>> {
+        try {
+            val response = newsProvider.searchTopHeadlines(
+                category = category,
+                page = page,
+                pageSize = pageSize
+            )
+
+            val searchResult = response.toDomain()
+
+            if (searchResult.status != "ok"){
+                return RequestResult.Error(Exception("Ошибка при запросе"))
+            }
+
+            return RequestResult.Success(searchResult.articles)
+        } catch (error: Exception){
+            return RequestResult.Error(error)
+        }
+    }
 }

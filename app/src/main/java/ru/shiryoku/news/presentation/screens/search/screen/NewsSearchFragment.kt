@@ -45,6 +45,7 @@ class NewsSearchFragment : Fragment() {
         navController = findNavController(requireActivity(), R.id.nav_host_fragment)
         setUpUi()
         setUpObserve()
+        viewModel.searchTopHeadlines()
         return binding.root
     }
 
@@ -67,22 +68,43 @@ class NewsSearchFragment : Fragment() {
                 if (isLoading == true || percentageScrolled < 70) return
 
                 val query = binding.searchBar.text.toString()
-                if (query.isEmpty()) return
+                if (query.isEmpty()) {
+                    viewModel.searchTopHeadlines()
+                    return
+                }
                 viewModel.searchNews(query)
             }
-        })
+        }
+        )
+        binding.swipeRefresh.setOnRefreshListener {
+            val query = binding.searchBar.text.toString()
+            if (query.isEmpty()) {
+                viewModel.searchTopHeadlines()
+                return@setOnRefreshListener
+            }
+            viewModel.searchNews(query)
+        }
+    }
 
+    @OptIn(FlowPreview::class)
+    override fun onResume() {
+        super.onResume()
         binding.searchBar.textChanges().debounce(SEARCH_DEBOUNCE)
             .onEach { text ->
-                if (text.isNullOrEmpty()) return@onEach
+                if (text.isNullOrEmpty()){
+                    viewModel.searchTopHeadlines()
+                    return@onEach
+                }
                 viewModel.resetSearch()
                 viewModel.searchNews(text.toString())
             }
             .launchIn(lifecycleScope)
     }
 
-
     private fun setUpObserve() {
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.swipeRefresh.isRefreshing = isLoading
+        }
         viewModel.articles.observe(viewLifecycleOwner) { articles ->
             lifecycleScope.launch {
                 adapter.submitList(articles)

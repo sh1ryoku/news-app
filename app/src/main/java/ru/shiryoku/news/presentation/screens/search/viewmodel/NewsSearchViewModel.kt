@@ -16,6 +16,8 @@ private const val pageSize = 20
 class NewsSearchViewModel(
     private val newsRepository: NewsRepository
 ) : ViewModel() {
+    private val category = "general"
+
     private var page = 1
 
     private var isLastPage = false
@@ -34,9 +36,27 @@ class NewsSearchViewModel(
         page = 1
     }
 
+    fun searchTopHeadlines(){
+        viewModelScope.launch {
+            _isLoading.value = true
+            when (val requestResult =
+                newsRepository.searchTopHeadlines(category = category, page = page, pageSize = pageSize)) {
+                is RequestResult.Success -> {
+                    handleArticlesPage(requestResult.data)
+                }
+
+                is RequestResult.Error -> {
+                    Log.e(
+                        "error",
+                        requestResult.exception.message ?: "Error occurred while fetching news"
+                    )
+                }
+            }
+            _isLoading.value = false
+        }
+    }
     fun searchNews(query: String) {
         if (isLastPage) return
-
         viewModelScope.launch {
             _isLoading.value = true
             when (val requestResult =
@@ -48,14 +68,14 @@ class NewsSearchViewModel(
                 is RequestResult.Error -> {
                     Log.e(
                         "error",
-                        requestResult.exception.message ?: "Error occured while fetching news"
+                        requestResult.exception.message ?: "Error occurred while fetching news"
                     )
                 }
             }
             _isLoading.value = false
+
         }
     }
-
 
     private fun handleArticlesPage(articles: List<Article>) {
         if (articles.isEmpty()) {
